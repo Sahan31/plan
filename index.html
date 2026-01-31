@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Planning Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .priority-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .priority-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .plan-category {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .plan-category h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .sub-item {
+            background: #f1f3f5;
+            padding: 12px;
+            margin: 8px 0 8px 30px;
+            border-radius: 6px;
+            border-left: 3px solid #adb5bd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 16px;
+            word-break: break-word;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .edit-btn, .delete-btn, .sub-add-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .sub-add-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .sub-add-btn:hover {
+            background: #138496;
+        }
+
+        .input-container {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .input-container button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .save-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .item, .sub-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item-actions {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .input-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 My Planning Dashboard</h1>
+            <p>Stay organized, stay focused</p>
+        </div>
+
+        <div class="priority-section">
+            <h2>🎯 Quick Access</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('weekly')">📆 Weekly Plan</button>
+                <button class="tab-btn" onclick="switchTab('daily')">📋 Daily Plan</button>
+            </div>
+            
+            <div id="weekly" class="section active">
+                <div class="plan-category">
+                    <h3>
+                        Weekly Goals
+                        <button class="add-btn" onclick="addItem('weekly')">+ Add Goal</button>
+                    </h3>
+                    <div id="weekly-items"></div>
+                </div>
+            </div>
+
+            <div id="daily" class="section">
+                <div class="plan-category">
+                    <h3>
+                        Daily Tasks
+                        <button class="add-btn" onclick="addItem('daily')">+ Add Task</button>
+                    </h3>
+                    <div id="daily-items"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2 style="color: #667eea; margin-bottom: 20px; font-size: 2em;">📊 Year Plan 2025</h2>
+            
+            <div class="plan-category">
+                <h3>
+                    💻 Web Dev Plan
+                    <button class="add-btn" onclick="addItem('webdev')">+ Add Goal</button>
+                </h3>
+                <div id="webdev-items"></div>
+            </div>
+
+            <div class="plan-category">
+                <h3>
+                    🎓 HND Plan
+                    <button class="add-btn" onclick="addItem('hnd')">+ Add Goal</button>
+                </h3>
+                <div id="hnd-items"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure
+        let data = {
+            weekly: [],
+            daily: [],
+            webdev: [],
+            hnd: []
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('planningData');
+            if (saved) {
+                data = JSON.parse(saved);
+            }
+            renderAll();
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('planningData', JSON.stringify(data));
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        // Add new item
+        function addItem(category) {
+            const container = document.getElementById(`${category}-items`);
+            const inputHTML = `
+                <div class="input-container">
+                    <input type="text" id="new-${category}" placeholder="Enter new item..." autofocus>
+                    <button class="save-btn" onclick="saveNewItem('${category}')">Save</button>
+                    <button class="cancel-btn" onclick="renderCategory('${category}')">Cancel</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', inputHTML);
+            document.getElementById(`new-${category}`).focus();
+        }
+
+        // Save new item
+        function saveNewItem(category) {
+            const input = document.getElementById(`new-${category}`);
+            const text = input.value.trim();
+            
+            if (text) {
+                data[category].push({
+                    id: Date.now(),
+                    text: text,
+                    subItems: []
+                });
+                saveData();
+                renderCategory(category);
+            }
+        }
+
+        // Add sub-item
+        function addSubItem(category, itemId) {
+            const item = data[category].find(i => i.id === itemId);
+            const text = prompt('Enter sub-item:');
+            
+            if (text && text.trim()) {
+                item.subItems.push({
+                    id: Date.now(),
+                    text: text.trim()
+                });
+                saveData();
+                renderCategory(category);
+            }
+        }
+
+        // Edit item
+        function editItem(category, itemId, isSubItem = false, parentId = null) {
+            let item;
+            if (isSubItem) {
+                const parent = data[category].find(i => i.id === parentId);
+                item = parent.subItems.find(si => si.id === itemId);
+            } else {
+                item = data[category].find(i => i.id === itemId);
+            }
+            
+            const newText = prompt('Edit item:', item.text);
+            
+            if (newText !== null && newText.trim()) {
+                item.text = newText.trim();
+                saveData();
+                renderCategory(category);
+            }
+        }
+
+        // Delete item
+        function deleteItem(category, itemId, isSubItem = false, parentId = null) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                if (isSubItem) {
+                    const parent = data[category].find(i => i.id === parentId);
+                    parent.subItems = parent.subItems.filter(si => si.id !== itemId);
+                } else {
+                    data[category] = data[category].filter(i => i.id !== itemId);
+                }
+                saveData();
+                renderCategory(category);
+            }
+        }
+
+        // Render category
+        function renderCategory(category) {
+            const container = document.getElementById(`${category}-items`);
+            const items = data[category];
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state">No items yet. Click "Add" to get started!</div>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach(item => {
+                html += `
+                    <div class="item">
+                        <div class="item-text">${item.text}</div>
+                        <div class="item-actions">
+                            <button class="sub-add-btn" onclick="addSubItem('${category}', ${item.id})">+ Sub</button>
+                            <button class="edit-btn" onclick="editItem('${category}', ${item.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteItem('${category}', ${item.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Render sub-items
+                item.subItems.forEach(subItem => {
+                    html += `
+                        <div class="sub-item">
+                            <div class="item-text">↳ ${subItem.text}</div>
+                            <div class="item-actions">
+                                <button class="edit-btn" onclick="editItem('${category}', ${subItem.id}, true, ${item.id})">Edit</button>
+                                <button class="delete-btn" onclick="deleteItem('${category}', ${subItem.id}, true, ${item.id})">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Render all categories
+        function renderAll() {
+            ['weekly', 'daily', 'webdev', 'hnd'].forEach(category => {
+                renderCategory(category);
+            });
+        }
+
+        // Handle Enter key for inputs
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                const category = e.target.id.replace('new-', '');
+                saveNewItem(category);
+            }
+        });
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
